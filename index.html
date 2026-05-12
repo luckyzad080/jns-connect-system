@@ -3,417 +3,441 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JNS.CONNECT - Official Service</title>
+    <title>JNS.CONNECT - ระบบลงทะเบียนผ่อนสินค้า</title>
     
+    <!-- นำเข้า Tailwind CSS และ Font -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;600&family=Fredoka:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Mitr', 'sans-serif'],
-                        heading: ['Fredoka', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-
     <style>
-        body { background-color: #f8f9fa; color: #1a1a1a; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
-        .bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); z-index: -2; }
-        .animate-up { animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .card-shadow { box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); }
-        .admin-login-overlay { background: rgba(255,255,255,0.9); backdrop-blur: 10px; }
-        #image-preview { max-height: 150px; object-fit: contain; display: none; }
-        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
+        body { font-family: 'Mitr', sans-serif; background-color: #f9fafb; color: #1f2937; }
+        .font-heading { font-family: 'Fredoka', sans-serif; }
+        .hidden { display: none !important; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .admin-sidebar { background: #111827; }
+        #image-preview { max-height: 150px; display: none; margin: 10px auto; border-radius: 12px; }
     </style>
 </head>
-<body class="antialiased font-sans flex justify-center">
+<body>
 
-    <div class="bg-canvas"></div>
-    
-    <!-- Customer View -->
-    <main id="customer-view" class="w-full max-w-[550px] min-h-screen relative pb-20 pt-12 px-6 flex flex-col items-center z-10 animate-up">
-        
-        <header class="w-full flex flex-col items-center mb-8 text-center">
-            <div class="w-24 h-24 rounded-full overflow-hidden border-[4px] border-white shadow-xl mb-4 bg-white">
-                <img src="https://img2.pic.in.th/April-Dump.png" alt="Logo" class="w-full h-full object-cover">
+    <!-- ==========================================
+         ส่วนที่ 1: หน้าสำหรับลูกค้า (Customer View)
+         ========================================== -->
+    <main id="customer-view" class="min-h-screen py-12 px-6 flex flex-col items-center">
+        <header class="text-center mb-10">
+            <div class="w-24 h-24 bg-black rounded-[2rem] flex items-center justify-center shadow-2xl mb-4 mx-auto rotate-3 hover:rotate-0 transition-transform">
+                <i class="fa-solid fa-bolt-lightning text-white text-4xl"></i>
             </div>
-            <h1 class="text-3xl font-heading font-bold mb-1">JNS.CONNECT</h1>
-            <p id="site-tagline" class="text-sm font-medium text-gray-500 italic">เจเอนเอสบริการรับผ่อนสินค้าทั่วจักรวาล ⎯⎯ ✨</p>
+            <h1 class="text-4xl font-heading font-bold tracking-tight">JNS.CONNECT</h1>
+            <p id="site-tagline" class="text-gray-400 text-sm mt-2 italic">กำลังเชื่อมต่อระบบ...</p>
         </header>
 
-        <!-- Status Block -->
-        <div id="status-block" class="w-full rounded-[1.5rem] p-5 mb-6 border bg-white/70 backdrop-blur-md card-shadow text-center">
-            <p class="text-[14px] font-bold text-black mb-2">รบกวนลูกค้ากรอกข้อมูลตามความเป็นจริง</p>
-            <p class="text-[12px] text-gray-600 mb-2 leading-relaxed">ทางร้านเก็บข้อมูลไว้เพียงส่วนตัวไม่มีเปิดเผยข้อมูลลูกค้าอย่างแน่นอน</p>
-            <p class="text-[13px] font-bold text-red-500">** กรุณากรอกข้อมูลให้ถูกต้องและครบถ้วนด้วยครับ **</p>
+        <!-- การ์ดแจ้งสถานะ -->
+        <div class="w-full max-w-md bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6 text-center">
+            <p id="status-msg" class="text-sm font-bold text-gray-800">รบกวนลูกค้ากรอกข้อมูลตามความเป็นจริง</p>
+            <p class="text-[11px] text-gray-400 mt-1">ข้อมูลของท่านจะถูกเก็บเป็นความลับสูงสุด</p>
         </div>
 
-        <!-- Form Section -->
-        <section class="w-full bg-white rounded-[2rem] p-6 mb-6 card-shadow border border-white">
-            <h2 class="font-bold text-lg mb-6 flex items-center gap-2">
-                <i class="fa-solid fa-file-signature text-black"></i> กรอกข้อมูลลูกค้า
+        <!-- ฟอร์มลงทะเบียน -->
+        <section id="form-container" class="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl border border-white relative overflow-hidden">
+            <!-- Overlay เมื่อร้านปิด -->
+            <div id="closed-overlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                <div class="text-center p-6">
+                    <i class="fa-solid fa-circle-xmark text-red-500 text-5xl mb-4"></i>
+                    <h3 class="text-xl font-bold">ขออภัย ร้านปิดทำการ</h3>
+                    <p class="text-gray-500 text-sm">กรุณาติดต่อแอดมินในเวลาทำการครับ</p>
+                </div>
+            </div>
+
+            <h2 class="font-bold text-xl mb-8 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square text-black"></i> กรอกข้อมูลลูกค้า
             </h2>
-            <form id="loan-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 ml-1 uppercase">ชื่อ-นามสกุล</label>
-                        <input type="text" id="cust-name" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="ระบุชื่อจริง">
+
+            <form id="loan-form" class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">ชื่อ-นามสกุล</label>
+                        <input type="text" id="c-name" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="ชื่อจริง">
                     </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 ml-1 uppercase">ชื่อเล่น</label>
-                        <input type="text" id="cust-nickname" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="ระบุชื่อเล่น">
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">ชื่อเล่น</label>
+                        <input type="text" id="c-nick" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="ชื่อเล่น">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 ml-1 uppercase">วัน/เดือน/ปีเกิด</label>
-                        <input type="date" id="cust-birthdate" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">วันเกิด</label>
+                        <input type="date" id="c-dob" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none">
                     </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 ml-1 uppercase">อายุ (คำนวณอัตโนมัติ)</label>
-                        <input type="text" id="cust-age" readonly class="w-full bg-gray-100 border-none p-4 rounded-2xl text-sm outline-none cursor-not-allowed" placeholder="อายุของคุณ">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 ml-1 uppercase">รหัสผ่อน</label>
-                        <input type="text" id="cust-code" class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="เช่น JNS-001">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 ml-1 uppercase">เบอร์โทรลูกค้า</label>
-                        <input type="text" id="cust-contact" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="ระบุเบอร์โทรศัพท์ที่ติดต่อได้">
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">อายุ</label>
+                        <input type="text" id="c-age" readonly class="w-full bg-gray-100 border-none p-4 rounded-2xl text-sm cursor-not-allowed text-gray-500" placeholder="คำนวณอัตโนมัติ">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 ml-1 uppercase">สินค้าที่ต้องการผ่อน</label>
-                        <input type="text" id="cust-product-name" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="เช่น iPhone 16">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">รหัสผ่อน</label>
+                        <input type="text" id="c-code" class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="JNS-XXX">
                     </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-400 ml-1 uppercase">ความจุที่ต้องการผ่อน</label>
-                        <input type="text" id="cust-storage" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="เช่น 128GB / 256GB">
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">เบอร์โทรลูกค้า</label>
+                        <input type="tel" id="c-tel" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="0XXXXXXXXX">
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-xs font-bold text-gray-400 ml-1 uppercase">ระบบการผ่อน</label>
-                    <select id="cust-system" class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none appearance-none">
-                        <option value="ผ่อนไปใช้ไป">ผ่อนไปใช้ไป (ได้ของก่อนผ่อนหมด)</option>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">สินค้าที่ต้องการผ่อน</label>
+                    <input type="text" id="c-prod" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="ระบุรุ่นสินค้า">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">ความจุที่ต้องการผ่อน</label>
+                    <input type="text" id="c-storage" required class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none" placeholder="เช่น 128GB, 256GB">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">ระบบการผ่อน</label>
+                    <select id="c-system" class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none">
+                        <option value="ผ่อนไปใช้ไป">ผ่อนไปใช้ไป (รับของก่อน)</option>
                         <option value="ผ่อนครบรับของ">ผ่อนครบรับของ</option>
-                        <option value="วางดาวน์">วางดาวน์ (รับของทันที)</option>
+                        <option value="วางดาวน์">วางดาวน์รับของทันที</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="text-xs font-bold text-gray-400 ml-1 uppercase block mb-2">แนบบัตรประจำตัวประชาชน</label>
-                    <div class="relative group">
-                        <input type="file" id="cust-id-card" accept="image/*" class="hidden">
-                        <label for="cust-id-card" class="cursor-pointer w-full bg-gray-50 border-2 border-dashed border-gray-200 p-8 rounded-2xl flex flex-col items-center justify-center hover:border-black transition-all">
-                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-300 mb-2"></i>
-                            <span class="text-xs text-gray-400 font-medium">คลิกเพื่ออัปโหลดรูปภาพ</span>
-                        </label>
-                        <img id="image-preview" class="mt-4 rounded-xl border mx-auto">
-                    </div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-2">แนบบัตรประชาชน (จำกัด 800KB)</label>
+                    <label class="flex flex-col items-center justify-center w-full h-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:border-black transition-colors">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <i class="fa-solid fa-cloud-arrow-up text-gray-300 text-2xl mb-2"></i>
+                            <p class="text-[10px] text-gray-400">คลิกเพื่ออัปโหลดรูปภาพ</p>
+                        </div>
+                        <input type="file" id="c-file" accept="image/*" class="hidden" />
+                    </label>
+                    <img id="image-preview" src="#" alt="Preview" />
                 </div>
 
-                <button type="submit" id="submit-btn" class="w-full bg-black text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-gray-900 active:scale-95 transition-all mt-4">
+                <button type="submit" id="submit-btn" class="w-full bg-black text-white font-bold py-4 rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
                     ส่งข้อมูล
                 </button>
             </form>
         </section>
 
-        <button onclick="showAdminLogin()" class="text-[10px] text-gray-300 font-bold uppercase tracking-widest mt-12 hover:text-gray-600 transition-colors">
+        <!-- ปุ่มลับสำหรับแอดมิน -->
+        <button onclick="showLogin()" class="mt-20 text-[10px] text-gray-300 font-bold tracking-[0.2em] hover:text-gray-500 uppercase">
             แผงควบคุมแอดมิน
         </button>
     </main>
 
-    <!-- Admin Login Modal -->
-    <div id="admin-login-modal" class="fixed inset-0 z-[150] hidden flex items-center justify-center admin-login-overlay p-6">
-        <div class="bg-white p-8 rounded-[2rem] shadow-2xl w-full max-w-[380px] animate-up border">
-            <h3 class="text-xl font-bold mb-2 text-center">Admin Access</h3>
-            <p class="text-xs text-gray-400 text-center mb-6">กรุณากรอกรหัสผ่านเพื่อเข้าสู่ระบบหลังบ้าน</p>
-            <div class="space-y-4">
-                <input type="password" id="admin-password" class="w-full bg-gray-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-black text-center text-lg tracking-widest" placeholder="••••••">
-                <div class="flex gap-2">
-                    <button onclick="closeAdminLogin()" class="flex-1 py-4 font-bold text-gray-400 text-sm">ยกเลิก</button>
-                    <button onclick="handleAdminLogin()" class="flex-1 bg-black text-white py-4 rounded-2xl font-bold shadow-lg">ยืนยัน</button>
-                </div>
-            </div>
-            <p id="login-error" class="text-red-500 text-[10px] text-center mt-4 font-bold"></p>
-        </div>
-    </div>
-
-    <!-- Admin View -->
-    <main id="admin-view" class="hidden w-full max-w-[1200px] min-h-screen relative pb-20 pt-12 px-6 z-10 animate-up">
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h2 class="text-2xl font-bold font-heading">Admin Central</h2>
-                <p class="text-xs text-gray-400">Database & Site Management</p>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="logoutAdmin()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-bold text-xs hover:bg-red-100">ออกจากระบบ</button>
-                <button onclick="toggleView('customer')" class="bg-white border px-6 py-2 rounded-full font-bold text-xs shadow-sm">หน้าบ้าน</button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Settings Panel -->
-            <div class="lg:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-white h-fit">
-                <h3 class="font-bold mb-4 text-gray-700 flex items-center gap-2 text-xs uppercase">
-                    <i class="fa-solid fa-sliders text-blue-500"></i> เว็บไซต์
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex gap-2 text-center text-[10px] mb-2 font-bold text-gray-400">
-                        สถานะร้าน (Admin เท่านั้น)
+    <!-- ==========================================
+         ส่วนที่ 2: หน้าสำหรับแอดมิน (Admin View)
+         ========================================== -->
+    <main id="admin-view" class="hidden min-h-screen bg-gray-50">
+        <div class="flex flex-col lg:flex-row min-h-screen">
+            <!-- แถบด้านข้าง (Sidebar) -->
+            <aside class="w-full lg:w-72 admin-sidebar text-white p-8 flex flex-col">
+                <div class="flex items-center gap-3 mb-10">
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-black">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <div class="flex gap-2">
-                        <button id="btn-open" onclick="setStoreStatus(true)" class="flex-1 py-3 rounded-xl font-bold text-xs">เปิด</button>
-                        <button id="btn-close" onclick="setStoreStatus(false)" class="flex-1 py-3 rounded-xl font-bold text-xs">ปิด</button>
-                    </div>
-                    <input id="input-tagline" type="text" class="w-full bg-gray-50 p-3 rounded-xl text-xs border-none" placeholder="คำโปรย...">
-                    <button onclick="saveContentChanges()" class="w-full bg-black text-white py-3 rounded-xl font-bold text-xs">บันทึก</button>
+                    <h2 class="font-bold text-xl font-heading">JNS Admin</h2>
                 </div>
-            </div>
 
-            <!-- Database Panel -->
-            <div class="lg:col-span-3 bg-white rounded-3xl shadow-sm border border-white overflow-hidden">
-                <div class="p-6 border-b border-gray-50 flex justify-between items-center">
-                    <h3 class="font-bold text-gray-700 flex items-center gap-2 text-sm uppercase">
-                        <i class="fa-solid fa-database text-amber-500"></i> รายการลูกค้าทั้งหมด
-                    </h3>
-                    <span id="data-count" class="bg-gray-100 text-[10px] px-3 py-1 rounded-full font-bold">0</span>
+                <div class="space-y-6 flex-1">
+                    <div>
+                        <label class="text-[10px] text-gray-500 font-bold uppercase block mb-4">การจัดการ</label>
+                        <nav class="space-y-2">
+                            <button class="w-full flex items-center gap-3 bg-white/10 p-4 rounded-2xl text-sm font-bold">
+                                <i class="fa-solid fa-users"></i> ข้อมูลลูกค้า
+                            </button>
+                            <button onclick="exitAdmin()" class="w-full flex items-center gap-3 hover:bg-white/5 p-4 rounded-2xl text-sm text-gray-400">
+                                <i class="fa-solid fa-house"></i> ไปหน้าหลัก
+                            </button>
+                        </nav>
+                    </div>
+
+                    <div class="pt-6 border-t border-white/10">
+                        <label class="text-[10px] text-gray-500 font-bold uppercase block mb-4">ตั้งค่าร้านค้า</label>
+                        <div class="flex gap-2 mb-4">
+                            <button id="adm-open" onclick="updateStatus(true)" class="flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all">เปิด</button>
+                            <button id="adm-close" onclick="updateStatus(false)" class="flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all">ปิด</button>
+                        </div>
+                        <label class="text-[10px] text-gray-500 font-bold uppercase block mb-2">คำโปรยหน้าเว็บ</label>
+                        <textarea id="adm-tagline" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs outline-none focus:border-white/40" rows="3"></textarea>
+                        <button onclick="saveSettings()" class="w-full mt-3 bg-white text-black py-3 rounded-xl text-xs font-bold shadow-lg">บันทึกตั้งค่า</button>
+                    </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase">
-                            <tr>
-                                <th class="px-6 py-4">ลูกค้า / อายุ</th>
-                                <th class="px-6 py-4">สินค้า/ความจุ/ระบบ</th>
-                                <th class="px-6 py-4">เอกสาร</th>
-                                <th class="px-6 py-4"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="db-body" class="text-sm divide-y divide-gray-50"></tbody>
-                    </table>
+
+                <button onclick="exitAdmin()" class="mt-10 text-red-400 text-xs font-bold hover:text-red-300">
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i> ออกจากระบบ
+                </button>
+            </aside>
+
+            <!-- เนื้อหาหลัก (Main Content) -->
+            <section class="flex-1 p-6 lg:p-12 overflow-y-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold">รายการลูกค้าลงทะเบียน</h3>
+                        <p class="text-sm text-gray-400">ข้อมูลจะอัปเดตแบบ Real-time</p>
+                    </div>
+                    <div class="bg-black text-white px-5 py-2 rounded-full text-xs font-bold">
+                        <span id="adm-count">0</span> รายการ
+                    </div>
                 </div>
-            </div>
+
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase">
+                                <tr>
+                                    <th class="px-6 py-5">ข้อมูลพื้นฐาน</th>
+                                    <th class="px-6 py-5">สินค้าที่สนใจ</th>
+                                    <th class="px-6 py-5">เอกสาร</th>
+                                    <th class="px-6 py-5 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adm-table-body" class="divide-y divide-gray-50">
+                                <tr><td colspan="4" class="p-20 text-center text-gray-300 text-xs italic">กำลังเชื่อมต่อข้อมูล...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
-    <!-- Image Modal -->
-    <div id="image-modal" class="fixed inset-0 bg-black/90 z-[200] hidden flex items-center justify-center p-6" onclick="this.classList.add('hidden')">
-        <img id="modal-full-img" class="max-w-full max-h-full rounded-lg shadow-2xl">
-    </div>
-
-    <!-- Feedback -->
-    <div id="success-modal" class="fixed inset-0 bg-black/60 z-[200] hidden flex flex-col justify-center items-center backdrop-blur-sm px-6">
-        <div class="bg-white rounded-[2.5rem] p-8 text-center max-w-[350px] w-full animate-up shadow-2xl">
-            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                <i class="fa-solid fa-check-circle"></i>
+    <!-- Modal เข้าสู่ระบบแอดมิน -->
+    <div id="modal-login" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+        <div class="bg-white p-10 rounded-[3rem] w-full max-w-sm shadow-2xl text-center">
+            <h3 class="text-2xl font-bold mb-6">ผู้ดูแลระบบ</h3>
+            <input type="password" id="login-pass" class="w-full bg-gray-100 p-5 rounded-2xl text-center text-3xl tracking-[0.3em] outline-none border-2 border-transparent focus:border-black" placeholder="••••••">
+            <div class="flex gap-4 mt-8">
+                <button onclick="hideLogin()" class="flex-1 py-4 font-bold text-gray-400">ยกเลิก</button>
+                <button onclick="handleLogin()" class="flex-1 bg-black text-white py-4 rounded-2xl font-bold shadow-lg">เข้าสู่ระบบ</button>
             </div>
-            <h3 class="text-xl font-bold mb-2">ส่งข้อมูลเรียบร้อย!</h3>
-            <p class="text-sm text-gray-500 mb-6">แอดมินได้รับข้อมูลของคุณแล้ว จะรีบตรวจสอบเอกสารและติดต่อกลับครับ</p>
-            <button onclick="location.reload()" class="w-full bg-black text-white py-4 rounded-2xl font-bold">ตกลง</button>
         </div>
     </div>
 
+    <!-- ส่วนของ Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // ตั้งค่า Firebase
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'jns-v2-full';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'jns-connect-final';
 
-        let user = null;
-        let isAdmin = false;
-        let idCardBase64 = null;
+        let userState = null;
+        let isStoreOpen = true;
+        let base64Image = null;
 
-        const configPath = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'global');
-        const leadsCol = collection(db, 'artifacts', appId, 'public', 'data', 'customer_leads');
+        // พาธข้อมูล (ตามกฎความปลอดภัย)
+        const configDoc = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'main');
+        const leadsCol = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
 
+        // ฟังก์ชันยืนยันตัวตน
         const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Auth initialization failed:", e);
             }
         };
+
+        // เริ่มต้นการยืนยันตัวตน
         initAuth();
 
+        // ตรวจสอบสถานะการล็อกอิน
         onAuthStateChanged(auth, (u) => {
-            user = u;
-            if (user) initRealtime();
+            if (u) {
+                userState = u;
+                // เริ่มดึงข้อมูล Real-time หลังจากล็อกอินสำเร็จเท่านั้น
+                initRealtime();
+            }
         });
 
+        // ฟังก์ชันดึงข้อมูลแบบ Real-time
         function initRealtime() {
-            onSnapshot(configPath, (snap) => {
-                if (snap.exists()) updateUI(snap.data());
-                else saveToFirestore(configPath, { isOpen: true, tagline: "เจเอนเอสบริการรับผ่อนสินค้าทั่วจักรวาล" });
-            });
-            onSnapshot(leadsCol, (snap) => renderAdminTable(snap.docs));
+            if (!userState) return;
+
+            // ดึงการตั้งค่าร้านค้า
+            onSnapshot(configDoc, (snap) => {
+                if (snap.exists()) {
+                    renderUI(snap.data());
+                } else {
+                    // สร้างค่าเริ่มต้นหากยังไม่มี
+                    setDoc(configDoc, { isOpen: true, tagline: "เจเอนเอสบริการรับผ่อนสินค้าทั่วประเทศ" });
+                }
+            }, (err) => console.error("Config listener error:", err));
+
+            // ดึงข้อมูลลูกค้า
+            onSnapshot(leadsCol, (snap) => {
+                renderTable(snap.docs);
+            }, (err) => console.error("Leads listener error:", err));
         }
 
-        document.getElementById('cust-birthdate').addEventListener('change', function(e) {
-            const birthDate = new Date(e.target.value);
-            if (isNaN(birthDate.getTime())) return;
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-            document.getElementById('cust-age').value = age > 0 ? age + " ปี" : "0 ปี";
+        // --- ระบบคำนวณอายุและอัปโหลดรูปภาพ ---
+        document.getElementById('c-dob').addEventListener('change', (e) => {
+            const birth = new Date(e.target.value);
+            const now = new Date();
+            let age = now.getFullYear() - birth.getFullYear();
+            if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;
+            document.getElementById('c-age').value = age > 0 ? age + " ปี" : "0 ปี";
         });
 
-        document.getElementById('cust-id-card').addEventListener('change', function(e) {
+        document.getElementById('c-file').addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                idCardBase64 = event.target.result;
-                const preview = document.getElementById('image-preview');
-                preview.src = idCardBase64;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            if (file) {
+                if (file.size > 850000) {
+                    alert("รูปภาพใหญ่เกินไปครับ (จำกัด 800KB)");
+                    e.target.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    base64Image = ev.target.result;
+                    const preview = document.getElementById('image-preview');
+                    preview.src = base64Image;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
         });
 
+        // --- ระบบส่งข้อมูล ---
         document.getElementById('loan-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!idCardBase64) return alert("กรุณาแนบรูปบัตรประชาชนครับ");
-
+            if (!isStoreOpen) return alert("ขออภัยครับ ร้านปิดรับข้อมูลชั่วคราว");
+            if (!base64Image) return alert("กรุณาแนบรูปบัตรประชาชนครับ");
+            
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่ง...';
-
-            const payload = {
-                name: document.getElementById('cust-name').value,
-                nickname: document.getElementById('cust-nickname').value,
-                birthdate: document.getElementById('cust-birthdate').value,
-                age: document.getElementById('cust-age').value,
-                code: document.getElementById('cust-code').value || 'ไม่มีรหัส',
-                contact: document.getElementById('cust-contact').value,
-                product: document.getElementById('cust-product-name').value,
-                storage: document.getElementById('cust-storage').value,
-                system: document.getElementById('cust-system').value,
-                idCardImage: idCardBase64,
-                createdAt: serverTimestamp()
-            };
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังส่ง...';
 
             try {
-                await addDoc(leadsCol, payload);
-                document.getElementById('success-modal').classList.remove('hidden');
+                await addDoc(leadsCol, {
+                    name: document.getElementById('c-name').value,
+                    nickname: document.getElementById('c-nick').value,
+                    dob: document.getElementById('c-dob').value,
+                    age: document.getElementById('c-age').value,
+                    code: document.getElementById('c-code').value || '-',
+                    tel: document.getElementById('c-tel').value,
+                    product: document.getElementById('c-prod').value,
+                    storage: document.getElementById('c-storage').value,
+                    system: document.getElementById('c-system').value,
+                    image: base64Image,
+                    createdAt: serverTimestamp()
+                });
+                alert("ลงทะเบียนสำเร็จ! ขอบคุณที่ไว้วางใจ JNS.CONNECT ครับ");
+                location.reload();
             } catch (err) {
                 alert("เกิดข้อผิดพลาด: " + err.message);
-            } finally {
                 btn.disabled = false;
-                btn.innerText = 'ส่งข้อมูล';
+                btn.innerText = "ส่งข้อมูล";
             }
         });
 
-        window.showAdminLogin = () => document.getElementById('admin-login-modal').classList.remove('hidden');
-        window.closeAdminLogin = () => {
-            document.getElementById('admin-login-modal').classList.add('hidden');
-            document.getElementById('login-error').innerText = '';
-        };
-
-        window.handleAdminLogin = () => {
-            const pass = document.getElementById('admin-password').value;
-            if (pass === '123456') {
-                isAdmin = true;
-                closeAdminLogin();
-                toggleView('admin');
+        // --- ฟังก์ชันแอดมิน ---
+        window.showLogin = () => document.getElementById('modal-login').classList.remove('hidden');
+        window.hideLogin = () => document.getElementById('modal-login').classList.add('hidden');
+        
+        window.handleLogin = () => {
+            // *** แก้ไขรหัสผ่านที่นี่ (ปัจจุบันคือ 130990) ***
+            const adminPassword = '123456'; 
+            
+            if (document.getElementById('login-pass').value === adminPassword) {
+                hideLogin();
+                document.getElementById('customer-view').classList.add('hidden');
+                document.getElementById('admin-view').classList.remove('hidden');
             } else {
-                document.getElementById('login-error').innerText = 'รหัสผ่านไม่ถูกต้อง';
+                alert("รหัสผ่านไม่ถูกต้อง");
             }
         };
 
-        window.logoutAdmin = () => { isAdmin = false; toggleView('customer'); };
+        window.exitAdmin = () => {
+            document.getElementById('admin-view').classList.add('hidden');
+            document.getElementById('customer-view').classList.remove('hidden');
+        };
 
-        function renderAdminTable(docs) {
-            const tbody = document.getElementById('db-body');
-            document.getElementById('data-count').innerText = docs.length;
+        window.updateStatus = (val) => {
+            setDoc(configDoc, { isOpen: val }, { merge: true });
+        };
+
+        window.saveSettings = () => {
+            const tagline = document.getElementById('adm-tagline').value;
+            setDoc(configDoc, { tagline }, { merge: true }).then(() => alert("บันทึกการตั้งค่าแล้ว"));
+        };
+
+        window.deleteLead = async (id) => {
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลลูกค้ารายนี้?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'leads', id));
+            }
+        };
+
+        // --- ฟังก์ชันเรนเดอร์ UI ---
+        function renderUI(data) {
+            isStoreOpen = data.isOpen;
+            document.getElementById('site-tagline').innerText = data.tagline;
+            document.getElementById('adm-tagline').value = data.tagline;
+            
+            // แสดง Overlay เมื่อร้านปิด
+            document.getElementById('closed-overlay').classList.toggle('hidden', isStoreOpen);
+            
+            // ปรับสีปุ่มสถานะแอดมิน
+            const btnO = document.getElementById('adm-open');
+            const btnC = document.getElementById('adm-close');
+            btnO.className = isStoreOpen ? "flex-1 py-3 rounded-xl text-[10px] font-bold bg-white text-black shadow-md border-transparent" : "flex-1 py-3 rounded-xl text-[10px] font-bold border-white/10 text-gray-500";
+            btnC.className = !isStoreOpen ? "flex-1 py-3 rounded-xl text-[10px] font-bold bg-red-500 text-white shadow-md border-transparent" : "flex-1 py-3 rounded-xl text-[10px] font-bold border-white/10 text-gray-500";
+        }
+
+        function renderTable(docs) {
+            const tbody = document.getElementById('adm-table-body');
+            document.getElementById('adm-count').innerText = docs.length;
             tbody.innerHTML = '';
-            const sorted = docs.map(d => ({id: d.id, ...d.data()}))
-                               .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
-            if (sorted.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-12 text-center text-gray-300">ไม่มีข้อมูล</td></tr>';
+            const list = docs.map(d => ({id: d.id, ...d.data()}))
+                             .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-20 text-center text-gray-300">ยังไม่มีข้อมูลลงทะเบียน</td></tr>';
                 return;
             }
 
-            sorted.forEach(item => {
+            list.forEach(item => {
                 const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
                 tr.innerHTML = `
-                    <td class="px-6 py-4">
-                        <div class="font-bold">${item.name} (${item.nickname})</div>
-                        <div class="text-[10px] text-gray-500">เกิด: ${item.birthdate || '-'} | อายุ: <span class="text-black font-bold">${item.age || '-'}</span></div>
-                        <div class="text-[10px] text-gray-400 font-mono mt-1">รหัส: ${item.code} | โทร: ${item.contact}</div>
+                    <td class="px-6 py-6">
+                        <div class="font-bold text-gray-900">${item.name} (${item.nickname})</div>
+                        <div class="text-[10px] text-gray-400">โทร: <span class="text-black font-bold">${item.tel}</span> | อายุ: ${item.age}</div>
+                        <div class="text-[9px] bg-gray-100 inline-block px-2 py-0.5 rounded mt-1">รหัส: ${item.code}</div>
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="text-xs font-bold">${item.product} (${item.storage || 'ไม่ระบุความจุ'})</div>
-                        <div class="text-[10px] text-blue-500">${item.system}</div>
+                    <td class="px-6 py-6">
+                        <div class="text-xs font-bold">${item.product}</div>
+                        <div class="text-[10px] text-blue-500 font-bold">${item.system} (${item.storage})</div>
                     </td>
-                    <td class="px-6 py-4">
-                        ${item.idCardImage ? `
-                            <img src="${item.idCardImage}" class="h-10 w-16 object-cover rounded border cursor-pointer hover:opacity-80" onclick="viewFullImage('${item.idCardImage}')">
-                        ` : '<span class="text-red-300 text-[10px]">ไม่มีรูป</span>'}
+                    <td class="px-6 py-6">
+                        <img src="${item.image}" class="h-10 w-16 object-cover rounded shadow-sm cursor-pointer hover:scale-150 transition-transform" onclick="window.open('${item.image}')">
                     </td>
-                    <td class="px-6 py-4 text-right">
-                        <button onclick="deleteLead('${item.id}')" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                    <td class="px-6 py-6 text-right">
+                        <button onclick="deleteLead('${item.id}')" class="text-gray-200 hover:text-red-500">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
-
-        window.viewFullImage = (src) => {
-            const modal = document.getElementById('image-modal');
-            const img = document.getElementById('modal-full-img');
-            img.src = src;
-            modal.classList.remove('hidden');
-        };
-
-        window.deleteLead = async (id) => {
-            if (confirm('ลบข้อมูลลูกค้ารายนี้?')) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'customer_leads', id));
-            }
-        };
-
-        function updateUI(data) {
-            document.getElementById('site-tagline').innerText = data.tagline;
-            document.getElementById('input-tagline').value = data.tagline;
-            const btnOpen = document.getElementById('btn-open');
-            const btnClose = document.getElementById('btn-close');
-            if (btnOpen && btnClose) {
-                btnOpen.className = data.isOpen ? "flex-1 py-3 rounded-xl font-bold text-xs bg-black text-white" : "flex-1 py-3 rounded-xl font-bold text-xs bg-gray-50 text-gray-300";
-                btnClose.className = !data.isOpen ? "flex-1 py-3 rounded-xl font-bold text-xs bg-red-500 text-white" : "flex-1 py-3 rounded-xl font-bold text-xs bg-gray-50 text-gray-300";
-            }
-        }
-
-        async function saveToFirestore(path, data) { await setDoc(path, data, { merge: true }); }
-        window.setStoreStatus = (isOpen) => saveToFirestore(configPath, { isOpen });
-        window.saveContentChanges = () => saveToFirestore(configPath, { tagline: document.getElementById('input-tagline').value });
-        window.toggleView = (view) => {
-            if (view === 'admin' && !isAdmin) return showAdminLogin();
-            document.getElementById('customer-view').classList.toggle('hidden', view === 'admin');
-            document.getElementById('admin-view').classList.toggle('hidden', view === 'customer');
-            window.scrollTo(0,0);
-        };
     </script>
 </body>
 </html>
