@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JNS.CONNECT - ระบบลงทะเบียนผ่อนสินค้า</title>
+    <title>JNS.CONNECT ระบบกรอกข้อมูล</title>
     
     <!-- นำเข้า Tailwind CSS และ Font -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -30,7 +30,7 @@
                 <i class="fa-solid fa-bolt-lightning text-white text-4xl"></i>
             </div>
             <h1 class="text-4xl font-heading font-bold tracking-tight">JNS.CONNECT</h1>
-            <p id="site-tagline" class="text-gray-400 text-sm mt-2 italic">กำลังเชื่อมต่อระบบ...</p>
+            <p id="site-tagline" class="text-gray-400 text-sm mt-2 italic">ยินดีต้อนรับสู่ระบบผ่อนสินค้า</p>
         </header>
 
         <!-- การ์ดแจ้งสถานะ -->
@@ -125,8 +125,8 @@
             </form>
         </section>
 
-        <!-- ปุ่มลับสำหรับแอดมิน -->
-        <button onclick="showLogin()" class="mt-20 text-[10px] text-gray-300 font-bold tracking-[0.2em] hover:text-gray-500 uppercase">
+        <!-- ปุ่มลับสำหรับแอดมิน (อยู่ด้านล่างสุด) -->
+        <button onclick="window.showLogin()" class="mt-20 text-[10px] text-gray-300 font-bold tracking-[0.2em] hover:text-gray-500 uppercase">
             แผงควบคุมแอดมิน
         </button>
     </main>
@@ -152,7 +152,7 @@
                             <button class="w-full flex items-center gap-3 bg-white/10 p-4 rounded-2xl text-sm font-bold">
                                 <i class="fa-solid fa-users"></i> ข้อมูลลูกค้า
                             </button>
-                            <button onclick="exitAdmin()" class="w-full flex items-center gap-3 hover:bg-white/5 p-4 rounded-2xl text-sm text-gray-400">
+                            <button onclick="window.exitAdmin()" class="w-full flex items-center gap-3 hover:bg-white/5 p-4 rounded-2xl text-sm text-gray-400">
                                 <i class="fa-solid fa-house"></i> ไปหน้าหลัก
                             </button>
                         </nav>
@@ -161,16 +161,16 @@
                     <div class="pt-6 border-t border-white/10">
                         <label class="text-[10px] text-gray-500 font-bold uppercase block mb-4">ตั้งค่าร้านค้า</label>
                         <div class="flex gap-2 mb-4">
-                            <button id="adm-open" onclick="updateStatus(true)" class="flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all">เปิด</button>
-                            <button id="adm-close" onclick="updateStatus(false)" class="flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all">ปิด</button>
+                            <button id="adm-open" onclick="window.updateStatus(true)" class="flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all">เปิด</button>
+                            <button id="adm-close" onclick="window.updateStatus(false)" class="flex-1 py-3 rounded-xl text-[10px] font-bold border transition-all">ปิด</button>
                         </div>
                         <label class="text-[10px] text-gray-500 font-bold uppercase block mb-2">คำโปรยหน้าเว็บ</label>
                         <textarea id="adm-tagline" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs outline-none focus:border-white/40" rows="3"></textarea>
-                        <button onclick="saveSettings()" class="w-full mt-3 bg-white text-black py-3 rounded-xl text-xs font-bold shadow-lg">บันทึกตั้งค่า</button>
+                        <button onclick="window.saveSettings()" class="w-full mt-3 bg-white text-black py-3 rounded-xl text-xs font-bold shadow-lg">บันทึกตั้งค่า</button>
                     </div>
                 </div>
 
-                <button onclick="exitAdmin()" class="mt-10 text-red-400 text-xs font-bold hover:text-red-300">
+                <button onclick="window.exitAdmin()" class="mt-10 text-red-400 text-xs font-bold hover:text-red-300">
                     <i class="fa-solid fa-right-from-bracket mr-2"></i> ออกจากระบบ
                 </button>
             </aside>
@@ -199,7 +199,7 @@
                                 </tr>
                             </thead>
                             <tbody id="adm-table-body" class="divide-y divide-gray-50">
-                                <tr><td colspan="4" class="p-20 text-center text-gray-300 text-xs italic">กำลังเชื่อมต่อข้อมูล...</td></tr>
+                                <tr><td colspan="4" class="p-20 text-center text-gray-300 text-xs italic">กำลังเตรียมพร้อมระบบ...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -214,34 +214,97 @@
             <h3 class="text-2xl font-bold mb-6">ผู้ดูแลระบบ</h3>
             <input type="password" id="login-pass" class="w-full bg-gray-100 p-5 rounded-2xl text-center text-3xl tracking-[0.3em] outline-none border-2 border-transparent focus:border-black" placeholder="••••••">
             <div class="flex gap-4 mt-8">
-                <button onclick="hideLogin()" class="flex-1 py-4 font-bold text-gray-400">ยกเลิก</button>
-                <button onclick="handleLogin()" class="flex-1 bg-black text-white py-4 rounded-2xl font-bold shadow-lg">เข้าสู่ระบบ</button>
+                <button onclick="window.hideLogin()" class="flex-1 py-4 font-bold text-gray-400">ยกเลิก</button>
+                <button onclick="window.handleLogin()" class="flex-1 bg-black text-white py-4 rounded-2xl font-bold shadow-lg">เข้าสู่ระบบ</button>
             </div>
         </div>
     </div>
 
-    <!-- ส่วนของ Firebase Logic -->
+    <!-- ส่วนที่ทำงานได้โดยไม่ต้องพึ่งพา Firebase (ป้องกันปุ่มพังเวลารันข้างนอก) -->
+    <script>
+        // ฟังก์ชันจัดการหน้าจอ UI ทั่วไป
+        window.showLogin = () => document.getElementById('modal-login').classList.remove('hidden');
+        window.hideLogin = () => document.getElementById('modal-login').classList.add('hidden');
+        
+        window.handleLogin = () => {
+            const adminPassword = '123456'; // <--- เปลี่ยนรหัสผ่านตรงนี้ได้
+            if (document.getElementById('login-pass').value === adminPassword) {
+                window.hideLogin();
+                document.getElementById('customer-view').classList.add('hidden');
+                document.getElementById('admin-view').classList.remove('hidden');
+            } else {
+                alert("รหัสผ่านไม่ถูกต้อง");
+            }
+        };
+
+        window.exitAdmin = () => {
+            document.getElementById('admin-view').classList.add('hidden');
+            document.getElementById('customer-view').classList.remove('hidden');
+            document.getElementById('login-pass').value = '';
+        };
+        
+        // ระบบคำนวณอายุและพรีวิวภาพ
+        document.getElementById('c-dob').addEventListener('change', (e) => {
+            const birth = new Date(e.target.value);
+            const now = new Date();
+            let age = now.getFullYear() - birth.getFullYear();
+            if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;
+            document.getElementById('c-age').value = age > 0 ? age + " ปี" : "0 ปี";
+        });
+
+        window.base64Image = null;
+        document.getElementById('c-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 850000) {
+                    alert("รูปภาพใหญ่เกินไปครับ (จำกัด 800KB)");
+                    e.target.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    window.base64Image = ev.target.result;
+                    const preview = document.getElementById('image-preview');
+                    preview.src = window.base64Image;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+    <!-- ส่วนของ Firebase Logic สำหรับเชื่อมต่อฐานข้อมูล -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ตั้งค่า Firebase
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // ตรวจสอบการตั้งค่า Firebase (กรณีนำไปรันที่เซิร์ฟเวอร์อื่น)
+        let firebaseConfig;
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } else {
+            // หากต้องการนำเว็บไปรันบนโฮสต์ของตัวเอง (เช่น Netlify, Vercel) 
+            // ให้เอา Config จาก Firebase ของตัวเองมาวางที่นี่ครับ
+            firebaseConfig = {
+                // apiKey: "...",
+                // authDomain: "...",
+                // projectId: "...",
+            };
+            console.warn("ไม่ได้รันในระบบ Canvas - กรุณาใส่ Firebase Config ของคุณเอง");
+        }
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'jns-connect-final';
 
         let userState = null;
-        let isStoreOpen = true;
-        let base64Image = null;
+        window.isStoreOpen = true;
 
-        // พาธข้อมูล (ตามกฎความปลอดภัย)
         const configDoc = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'main');
         const leadsCol = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
 
-        // ฟังก์ชันยืนยันตัวตน
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -254,71 +317,55 @@
             }
         };
 
-        // เริ่มต้นการยืนยันตัวตน
         initAuth();
 
-        // ตรวจสอบสถานะการล็อกอิน
         onAuthStateChanged(auth, (u) => {
             if (u) {
                 userState = u;
-                // เริ่มดึงข้อมูล Real-time หลังจากล็อกอินสำเร็จเท่านั้น
                 initRealtime();
             }
         });
 
-        // ฟังก์ชันดึงข้อมูลแบบ Real-time
         function initRealtime() {
             if (!userState) return;
 
-            // ดึงการตั้งค่าร้านค้า
             onSnapshot(configDoc, (snap) => {
                 if (snap.exists()) {
                     renderUI(snap.data());
                 } else {
-                    // สร้างค่าเริ่มต้นหากยังไม่มี
                     setDoc(configDoc, { isOpen: true, tagline: "เจเอนเอสบริการรับผ่อนสินค้าทั่วประเทศ" });
                 }
-            }, (err) => console.error("Config listener error:", err));
+            }, (err) => console.error("Config error:", err));
 
-            // ดึงข้อมูลลูกค้า
             onSnapshot(leadsCol, (snap) => {
                 renderTable(snap.docs);
-            }, (err) => console.error("Leads listener error:", err));
+            }, (err) => console.error("Leads error:", err));
         }
 
-        // --- ระบบคำนวณอายุและอัปโหลดรูปภาพ ---
-        document.getElementById('c-dob').addEventListener('change', (e) => {
-            const birth = new Date(e.target.value);
-            const now = new Date();
-            let age = now.getFullYear() - birth.getFullYear();
-            if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;
-            document.getElementById('c-age').value = age > 0 ? age + " ปี" : "0 ปี";
-        });
+        // เชื่อมโยงฟังก์ชันแอดมินกับ Firebase
+        window.updateStatus = (val) => {
+            if(!userState) return alert("ยังไม่เชื่อมต่อฐานข้อมูล");
+            setDoc(configDoc, { isOpen: val }, { merge: true });
+        };
 
-        document.getElementById('c-file').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.size > 850000) {
-                    alert("รูปภาพใหญ่เกินไปครับ (จำกัด 800KB)");
-                    e.target.value = '';
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    base64Image = ev.target.result;
-                    const preview = document.getElementById('image-preview');
-                    preview.src = base64Image;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+        window.saveSettings = () => {
+            if(!userState) return alert("ยังไม่เชื่อมต่อฐานข้อมูล");
+            const tagline = document.getElementById('adm-tagline').value;
+            setDoc(configDoc, { tagline }, { merge: true }).then(() => alert("บันทึกการตั้งค่าแล้ว"));
+        };
+
+        window.deleteLead = async (id) => {
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลลูกค้ารายนี้?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'leads', id));
             }
-        });
+        };
 
-        // --- ระบบส่งข้อมูล ---
+        // ระบบส่งข้อมูลลง Firestore
         document.getElementById('loan-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!isStoreOpen) return alert("ขออภัยครับ ร้านปิดรับข้อมูลชั่วคราว");
-            if (!base64Image) return alert("กรุณาแนบรูปบัตรประชาชนครับ");
+            if (!window.isStoreOpen) return alert("ขออภัยครับ ร้านปิดรับข้อมูลชั่วคราว");
+            if (!window.base64Image) return alert("กรุณาแนบรูปบัตรประชาชนครับ");
+            if (!userState) return alert("ระบบยังไม่พร้อมทำงาน กรุณารอสักครู่");
             
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
@@ -335,7 +382,7 @@
                     product: document.getElementById('c-prod').value,
                     storage: document.getElementById('c-storage').value,
                     system: document.getElementById('c-system').value,
-                    image: base64Image,
+                    image: window.base64Image,
                     createdAt: serverTimestamp()
                 });
                 alert("ลงทะเบียนสำเร็จ! ขอบคุณที่ไว้วางใจ JNS.CONNECT ครับ");
@@ -347,57 +394,18 @@
             }
         });
 
-        // --- ฟังก์ชันแอดมิน ---
-        window.showLogin = () => document.getElementById('modal-login').classList.remove('hidden');
-        window.hideLogin = () => document.getElementById('modal-login').classList.add('hidden');
-        
-        window.handleLogin = () => {
-            // *** แก้ไขรหัสผ่านที่นี่ (ปัจจุบันคือ 130990) ***
-            const adminPassword = '123456'; 
-            
-            if (document.getElementById('login-pass').value === adminPassword) {
-                hideLogin();
-                document.getElementById('customer-view').classList.add('hidden');
-                document.getElementById('admin-view').classList.remove('hidden');
-            } else {
-                alert("รหัสผ่านไม่ถูกต้อง");
-            }
-        };
-
-        window.exitAdmin = () => {
-            document.getElementById('admin-view').classList.add('hidden');
-            document.getElementById('customer-view').classList.remove('hidden');
-        };
-
-        window.updateStatus = (val) => {
-            setDoc(configDoc, { isOpen: val }, { merge: true });
-        };
-
-        window.saveSettings = () => {
-            const tagline = document.getElementById('adm-tagline').value;
-            setDoc(configDoc, { tagline }, { merge: true }).then(() => alert("บันทึกการตั้งค่าแล้ว"));
-        };
-
-        window.deleteLead = async (id) => {
-            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลลูกค้ารายนี้?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'leads', id));
-            }
-        };
-
-        // --- ฟังก์ชันเรนเดอร์ UI ---
+        // ฟังก์ชันปรับหน้าจอ
         function renderUI(data) {
-            isStoreOpen = data.isOpen;
-            document.getElementById('site-tagline').innerText = data.tagline;
-            document.getElementById('adm-tagline').value = data.tagline;
+            window.isStoreOpen = data.isOpen;
+            document.getElementById('site-tagline').innerText = data.tagline || "";
+            document.getElementById('adm-tagline').value = data.tagline || "";
             
-            // แสดง Overlay เมื่อร้านปิด
-            document.getElementById('closed-overlay').classList.toggle('hidden', isStoreOpen);
+            document.getElementById('closed-overlay').classList.toggle('hidden', window.isStoreOpen);
             
-            // ปรับสีปุ่มสถานะแอดมิน
             const btnO = document.getElementById('adm-open');
             const btnC = document.getElementById('adm-close');
-            btnO.className = isStoreOpen ? "flex-1 py-3 rounded-xl text-[10px] font-bold bg-white text-black shadow-md border-transparent" : "flex-1 py-3 rounded-xl text-[10px] font-bold border-white/10 text-gray-500";
-            btnC.className = !isStoreOpen ? "flex-1 py-3 rounded-xl text-[10px] font-bold bg-red-500 text-white shadow-md border-transparent" : "flex-1 py-3 rounded-xl text-[10px] font-bold border-white/10 text-gray-500";
+            btnO.className = window.isStoreOpen ? "flex-1 py-3 rounded-xl text-[10px] font-bold bg-white text-black shadow-md border-transparent" : "flex-1 py-3 rounded-xl text-[10px] font-bold border-white/10 text-gray-500";
+            btnC.className = !window.isStoreOpen ? "flex-1 py-3 rounded-xl text-[10px] font-bold bg-red-500 text-white shadow-md border-transparent" : "flex-1 py-3 rounded-xl text-[10px] font-bold border-white/10 text-gray-500";
         }
 
         function renderTable(docs) {
@@ -430,7 +438,7 @@
                         <img src="${item.image}" class="h-10 w-16 object-cover rounded shadow-sm cursor-pointer hover:scale-150 transition-transform" onclick="window.open('${item.image}')">
                     </td>
                     <td class="px-6 py-6 text-right">
-                        <button onclick="deleteLead('${item.id}')" class="text-gray-200 hover:text-red-500">
+                        <button onclick="window.deleteLead('${item.id}')" class="text-gray-200 hover:text-red-500">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
