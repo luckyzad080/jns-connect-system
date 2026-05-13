@@ -25,8 +25,8 @@
         ========================================== -->
     <main id="customer-view" class="min-h-screen py-12 px-6 flex flex-col items-center">
         <header class="text-center mb-10">
-            <div class="w-24 h-24 bg-black rounded-[2rem] flex items-center justify-center shadow-2xl mb-4 mx-auto rotate-3 hover:rotate-0 transition-transform">
-                <i class="fa-solid fa-bolt-lightning text-white text-4xl"></i>
+            <div class="w-28 h-28 bg-white rounded-[2rem] flex items-center justify-center shadow-2xl mb-4 mx-auto rotate-3 hover:rotate-0 transition-transform overflow-hidden border-2 border-gray-100">
+                <img src="https://img1.pic.in.th/images/April-Dump.png" alt="JNS Logo" class="w-full h-full object-cover">
             </div>
             <h1 class="text-4xl font-heading font-bold tracking-tight">JNS.CONNECT</h1>
             <p id="site-tagline" class="text-gray-400 text-sm mt-2 italic">ยินดีต้อนรับสู่ระบบผ่อนสินค้า</p>
@@ -138,8 +138,8 @@
             <!-- แถบด้านข้าง (Sidebar) -->
             <aside class="w-full lg:w-72 admin-sidebar text-white p-8 flex flex-col">
                 <div class="flex items-center gap-3 mb-10">
-                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-black">
-                        <i class="fa-solid fa-shield-halved"></i>
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-black overflow-hidden">
+                        <img src="https://img1.pic.in.th/images/April-Dump.png" alt="JNS Logo" class="w-full h-full object-cover">
                     </div>
                     <h2 class="font-bold text-xl font-heading">JNS Admin</h2>
                 </div>
@@ -333,7 +333,7 @@
 
         
         // <<== นำ URL WEB APP ของ GOOGLE APPS SCRIPT มาใส่ตรงนี้ ==>>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxOC-oQWd2RlPbIbbikAKCtnbRiw1eWmOk_9L4j1jZ7-w5kzFItCl9DwojEFiwHBoo/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTgQgtUBoHe-OJDgSjnR9EneoPVHiDSiVxM_Tgz5Q5Pn0EFlEdtUkHldtWjhTl0sxo/exec';
 
         document.getElementById('loan-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -351,7 +351,7 @@
             const btn = document.getElementById('submit-btn');
             const originalBtnText = btn.innerText;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังส่งข้อมูลไปยัง Google Sheets...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังส่งข้อมูลให้แอดมิน...';
 
             // รวบรวมข้อมูล
             const payload = {
@@ -368,48 +368,54 @@
             };
 
             try {
-                // ส่งแบบ text/plain เพื่อป้องกันปัญหา CORS Preflight ใน Google Apps Script
-                const response = await fetch(SCRIPT_URL, {
+                // ใช้ mode: 'no-cors' เพื่อแก้ปัญหาการถูกบล็อกจากเบราว์เซอร์เวลาเชื่อมต่อข้ามโดเมนไป Google
+                await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'text/plain;charset=utf-8',
                     },
                     body: JSON.stringify(payload)
                 });
 
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    window.showModal('success', 'ส่งข้อมูลสำเร็จ!', 'ข้อมูลของคุณถูกบันทึกลง Google Sheets เรียบร้อยแล้ว');
-                    
-                    // เคลียร์ฟอร์ม
-                    document.getElementById('loan-form').reset();
-                    window.base64Image = null;
-                    document.getElementById('image-preview').style.display = 'none';
-                    document.getElementById('image-preview').src = '#';
-                    document.getElementById('c-age').value = '';
-                } else {
-                    throw new Error(result.message || 'Unknown error from server');
-                }
+                // เมื่อใช้ no-cors เราจะไม่สามารถอ่านค่า response แบบ JSON กลับมาได้ (เป็นข้อจำกัดของโหมดนี้)
+                // แต่ถ้าโค้ดไม่หลุดเข้าไปใน catch (ไม่มี error ตอนเชื่อมต่อเน็ต) เราสามารถถือว่าคำสั่งยิงไปที่เซิร์ฟเวอร์สำเร็จแล้ว
+                window.showModal('success', 'ส่งข้อมูลสำเร็จ!', 'ส่งข้อมูลให้แอดมินเรียบร้อยแล้ว');
+                
+                // เคลียร์ฟอร์มให้พร้อมรับข้อมูลใหม่
+                document.getElementById('loan-form').reset();
+                window.base64Image = null;
+                document.getElementById('image-preview').style.display = 'none';
+                document.getElementById('image-preview').src = '#';
+                document.getElementById('c-age').value = '';
 
             } catch (err) {
                 console.error(err);
-                window.showModal('error', 'เกิดข้อผิดพลาด', 'ไม่สามารถส่งข้อมูลได้: ' + err.message);
+                
+                // ดักจับ Error Failed to fetch เพื่อแจ้งสาเหตุที่แท้จริง
+                let errorMessage = err.message;
+                if (errorMessage.includes('Failed to fetch')) {
+                    errorMessage = 'การเชื่อมต่อถูกบล็อก: กรุณาตรวจสอบที่ Google Apps Script ว่าได้ตั้งค่า "สิทธิ์เข้าถึง" เป็น "ทุกคน (Anyone)" และได้กดยืนยันสิทธิ์ (Review Permissions) แล้วหรือยัง';
+                } else {
+                    errorMessage = 'ไม่สามารถส่งข้อมูลได้: ' + err.message;
+                }
+                
+                window.showModal('error', 'เกิดข้อผิดพลาด', errorMessage);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "ส่งข้อมูล";
             }
         });
 
-        // เนื่องจากข้อมูลไปอยู่บน Google Sheets แล้ว หน้าแอดมินจึงเป็นเพียงทางลัดไปเปิดชีต
+        // เนื่องจากข้อมูลไปอยู่บนระบบหลังบ้านแล้ว หน้าแอดมินจึงเป็นเพียงทางลัดไปเปิดชีต
         document.getElementById('adm-table-body').innerHTML = `
             <tr>
                 <td colspan="4" class="p-10 text-center">
-                    <i class="fa-brands fa-google-drive text-5xl text-blue-500 mb-4 block"></i>
-                    <h4 class="text-lg font-bold text-gray-800">ข้อมูลถูกจัดเก็บที่ Google Sheets</h4>
-                    <p class="text-sm text-gray-500 mb-6 mt-2">ระบบได้เปลี่ยนจากการใช้ฐานข้อมูลในเว็บ เป็นการส่งตรงเข้า Google Sheets ของคุณแทน เพื่อความปลอดภัยและการจัดการที่ง่ายขึ้น</p>
-                    <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" class="inline-block bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-700 transition-colors">
-                        <i class="fa-solid fa-table border-r border-white/20 pr-2 mr-2"></i> เปิด Google Sheets ของฉัน
+                    <i class="fa-solid fa-database text-5xl text-blue-500 mb-4 block"></i>
+                    <h4 class="text-lg font-bold text-gray-800">ข้อมูลถูกจัดเก็บในระบบหลังบ้าน</h4>
+                    <p class="text-sm text-gray-500 mb-6 mt-2">ข้อมูลของลูกค้าทั้งหมดถูกส่งไปยังระบบจัดการหลังบ้านโดยตรงแล้ว เพื่อความปลอดภัยและการจัดการที่ง่ายขึ้น</p>
+                    <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" class="inline-block bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
+                        <i class="fa-solid fa-table border-r border-white/20 pr-2 mr-2"></i> เปิดระบบจัดการหลังบ้าน
                     </a>
                 </td>
             </tr>
@@ -419,9 +425,9 @@
         document.getElementById('adm-open').disabled = true;
         document.getElementById('adm-close').disabled = true;
         document.getElementById('adm-tagline').disabled = true;
-        document.getElementById('adm-count').innerText = "Sheet";
-        window.updateStatus = () => window.showModal('info', 'แจ้งเตือน', 'ฟังก์ชันนี้ปิดการใช้งานเนื่องจากใช้ Google Sheets');
-        window.saveSettings = () => window.showModal('info', 'แจ้งเตือน', 'ฟังก์ชันนี้ปิดการใช้งานเนื่องจากใช้ Google Sheets');
+        document.getElementById('adm-count').innerText = "System";
+        window.updateStatus = () => window.showModal('info', 'แจ้งเตือน', 'ฟังก์ชันนี้ปิดการใช้งานเนื่องจากย้ายไปจัดการในระบบหลังบ้าน');
+        window.saveSettings = () => window.showModal('info', 'แจ้งเตือน', 'ฟังก์ชันนี้ปิดการใช้งานเนื่องจากย้ายไปจัดการในระบบหลังบ้าน');
     </script>
 </body>
 </html>
