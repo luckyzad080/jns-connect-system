@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -100,7 +101,7 @@
                 <div>
                     <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">ระบบการผ่อน</label>
                     <select id="c-system" class="w-full bg-gray-50 border-none p-4 rounded-2xl text-sm focus:ring-2 focus:ring-black outline-none">
-                        <option value="ผ่อนไปใช้ไป">ผ่อนไปใช้ไป (รับของก่อน)</option>
+                        <option value="ผ่อนไปใช้ไป">ผ่อนไปใช้ไป</option>
                         <option value="ผ่อนครบรับของ">ผ่อนครบรับของ</option>
                         <option value="วางดาวน์">วางดาวน์รับของทันที</option>
                     </select>
@@ -270,7 +271,7 @@
         window.hideLogin = () => document.getElementById('modal-login').classList.add('hidden');
         
         window.handleLogin = () => {
-            const adminPassword = '130990'; 
+            const adminPassword = '123456'; 
             if (document.getElementById('login-pass').value === adminPassword) {
                 window.hideLogin();
                 document.getElementById('customer-view').classList.add('hidden');
